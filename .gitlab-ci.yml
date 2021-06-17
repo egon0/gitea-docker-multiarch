@@ -15,8 +15,9 @@ build:
     D_IMAGE_TAG: egon0/gitea-multiarch:$CI_COMMIT_REF_SLUG
     D_LATEST_TAG: egon0/gitea-multiarch:latest
   script:
-    - git clone https://github.com/go-gitea/gitea.git -b release/v1.14
-    - cd gitea
+    - apk add --no-cache jq wget
+    - GITEA_VERSION=$(wget --quiet "https://api.github.com/repos/go-gitea/gitea/releases/latest" -O - |  jq -r '.tag_name'); fi && wget https://github.com/go-gitea/gitea/archive/${GITEA_VERSION}.tar.gz -O /tmp/gitea.tar.gz
+    - tar xf /tmp/gitea.tar.gz --strip-components=1
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
     - docker login -u $DOCKER_LOGIN -p $DOCKER_PASSWORD
     - docker buildx create --use --name A$CI_COMMIT_SHORT_SHA
